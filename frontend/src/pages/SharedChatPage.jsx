@@ -1,9 +1,11 @@
 import { useState, useEffect } from 'react'
 import { Bot } from 'lucide-react'
+import { useTranslation } from 'react-i18next'
 import { getChatbotByShareToken } from '../api'
 import ChatWindow from '../components/ChatWindow'
 
 export default function SharedChatPage() {
+  const { t } = useTranslation()
   const shareToken = window.location.pathname.split('/s/')[1]
   const [chatbot, setChatbot] = useState(null)
   const [error, setError] = useState(null)
@@ -20,9 +22,9 @@ export default function SharedChatPage() {
       setChatbot(res.data.data)
     } catch (err) {
       if (err.response?.status === 403) {
-        setError('This chatbot is currently inactive.')
+        setError(t('chat.inactive'))
       } else {
-        setError('Chatbot not found or unavailable.')
+        setError(t('chat.notFound'))
       }
     }
   }
@@ -41,7 +43,7 @@ export default function SharedChatPage() {
   if (!chatbot) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="animate-pulse text-gray-400">Loading...</div>
+        <div className="animate-pulse text-gray-400">{t('common.loading')}</div>
       </div>
     )
   }

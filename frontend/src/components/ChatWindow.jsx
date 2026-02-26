@@ -1,9 +1,11 @@
 import { useState, useEffect, useRef } from 'react'
 import { Send, Bot, User, Loader2 } from 'lucide-react'
+import { useTranslation } from 'react-i18next'
 import { sendMessage } from '../api'
 import ActionRenderer from './ActionRenderer'
 
 export default function ChatWindow({ chatbotId, chatbot }) {
+  const { t } = useTranslation()
   const [messages, setMessages] = useState([])
   const [input, setInput] = useState('')
   const [loading, setLoading] = useState(false)
@@ -50,7 +52,7 @@ export default function ChatWindow({ chatbotId, chatbot }) {
         ...prev,
         {
           role: 'assistant',
-          content: 'Sorry, an error occurred. Please try again.',
+          content: t('chat.errorMessage'),
           error: true,
         },
       ])
@@ -72,7 +74,7 @@ export default function ChatWindow({ chatbotId, chatbot }) {
       ...prev,
       {
         role: 'assistant',
-        content: `Action completed successfully! ${actionResult?.message || ''}`,
+        content: t('chat.actionCompleted', { message: actionResult?.message || '' }),
         isSystemMessage: true,
       },
     ])
@@ -92,11 +94,11 @@ export default function ChatWindow({ chatbotId, chatbot }) {
               {chatbot?.name || 'Chatbot'}
             </h3>
             <p className="text-sm text-gray-500 mt-1 max-w-md">
-              {chatbot?.description || 'Ask me anything! I\'m here to help.'}
+              {chatbot?.description || t('chat.askAnything')}
             </p>
             {chatbot?.department && (
               <span className="mt-2 text-xs bg-gray-100 text-gray-600 px-3 py-1 rounded-full">
-                {chatbot.department} Department
+                {t('chat.departmentLabel', { department: chatbot.department })}
               </span>
             )}
           </div>
@@ -169,7 +171,7 @@ export default function ChatWindow({ chatbotId, chatbot }) {
             value={input}
             onChange={(e) => setInput(e.target.value)}
             onKeyDown={handleKeyDown}
-            placeholder="Type your message..."
+            placeholder={t('chat.typeMessage')}
             rows={1}
             className="flex-1 px-4 py-3 border border-gray-300 rounded-xl resize-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm"
             style={{ maxHeight: '120px' }}

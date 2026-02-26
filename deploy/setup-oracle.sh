@@ -59,47 +59,17 @@ sudo iptables -I INPUT 6 -m state --state NEW -p tcp --dport 443 -j ACCEPT
 sudo netfilter-persistent save 2>/dev/null || true
 echo "Firewall rules applied."
 
-# ---- Step 5: Setup .env and GHCR login ----
+# ---- Step 5: Setup .env ----
 echo ""
 echo "[5/5] Setting up environment..."
 cd "$(dirname "$0")/.."
 
 if [ ! -f .env ]; then
     cp .env.example .env
+    echo ".env file created from .env.example"
+else
+    echo ".env file already exists."
 fi
-
-echo ""
-echo "============================================"
-echo "  GHCR (GitHub Container Registry) Login"
-echo "============================================"
-echo ""
-echo "  Pre-built Docker images are pulled from GHCR."
-echo "  You need a GitHub Personal Access Token (PAT)"
-echo "  with 'read:packages' scope."
-echo ""
-echo "  Create one at: https://github.com/settings/tokens"
-echo ""
-read -p "  GitHub Username: " GH_USER
-read -sp "  GitHub PAT (read:packages): " GH_TOKEN
-echo ""
-
-echo "$GH_TOKEN" | docker login ghcr.io -u "$GH_USER" --password-stdin
-
-echo ""
-echo "  GHCR login successful!"
-
-echo ""
-echo "============================================"
-echo "  Configure .env"
-echo "============================================"
-echo ""
-echo "  Edit .env file and set:"
-echo ""
-echo "    GHCR_REPO=ghcr.io/<owner>/chatbot-builder"
-echo ""
-echo "  API keys can now be set via the Settings page"
-echo "  in the web UI after deployment."
-echo "============================================"
 
 echo ""
 echo "=========================================="
@@ -112,6 +82,8 @@ echo "    2. Set GHCR_REPO:   GHCR_REPO=ghcr.io/<owner>/chatbot-builder"
 echo "    3. Deploy:           ./deploy/update.sh"
 echo "    4. View logs:        docker compose -f docker-compose.prod.yml logs -f"
 echo "    5. Access:           http://<YOUR_PUBLIC_IP>"
+echo ""
+echo "  API keys are managed via the Settings page in the web UI."
 echo ""
 echo "  Stop:    docker compose -f docker-compose.prod.yml down"
 echo "  Update:  ./deploy/update.sh"

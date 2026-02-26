@@ -7,10 +7,12 @@ import {
   listChatbots, createChatbot, getChatbot, updateChatbot, deleteChatbot,
   uploadDocument, listDocuments, deleteDocument, listActions
 } from '../api'
+import { useTranslation } from 'react-i18next'
 import LLMSelector from '../components/LLMSelector'
 import ActionEditor from '../components/ActionEditor'
 
 export default function BuilderPage() {
+  const { t } = useTranslation()
   const [chatbots, setChatbots] = useState([])
   const [selectedId, setSelectedId] = useState(null)
   const [selectedBot, setSelectedBot] = useState(null)
@@ -86,7 +88,7 @@ export default function BuilderPage() {
       })
       fetchChatbots()
     } catch (err) {
-      alert('Failed to create chatbot: ' + (err.response?.data?.detail || err.message))
+      alert(t('builder.failedCreate') + (err.response?.data?.detail || err.message))
     }
   }
 
@@ -100,14 +102,14 @@ export default function BuilderPage() {
       fetchChatbots()
       fetchChatbotDetail(selectedId)
     } catch (err) {
-      alert('Failed to update chatbot')
+      alert(t('builder.failedUpdate'))
     } finally {
       setSaving(false)
     }
   }
 
   const handleDelete = async (id) => {
-    if (!confirm('Are you sure you want to delete this chatbot?')) return
+    if (!confirm(t('builder.confirmDelete'))) return
     try {
       await deleteChatbot(id)
       if (selectedId === id) {
@@ -116,7 +118,7 @@ export default function BuilderPage() {
       }
       fetchChatbots()
     } catch (err) {
-      alert('Failed to delete chatbot')
+      alert(t('builder.failedDelete'))
     }
   }
 
@@ -128,7 +130,7 @@ export default function BuilderPage() {
       await uploadDocument(selectedId, file)
       fetchChatbotDetail(selectedId)
     } catch (err) {
-      alert('Failed to upload: ' + (err.response?.data?.detail || err.message))
+      alert(t('builder.failedUpload') + (err.response?.data?.detail || err.message))
     } finally {
       setUploading(false)
       e.target.value = ''
@@ -140,7 +142,7 @@ export default function BuilderPage() {
       await deleteDocument(docId)
       fetchChatbotDetail(selectedId)
     } catch (err) {
-      alert('Failed to delete document')
+      alert(t('builder.failedDeleteDoc'))
     }
   }
 
@@ -157,11 +159,11 @@ export default function BuilderPage() {
         <div className="w-80 flex-shrink-0">
           <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
             <div className="p-4 border-b border-gray-200 flex items-center justify-between">
-              <h2 className="font-bold text-gray-800">My Chatbots</h2>
+              <h2 className="font-bold text-gray-800">{t('builder.myChatbots')}</h2>
               <button
                 onClick={() => setShowCreateForm(true)}
                 className="p-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
-                title="Create New Chatbot"
+                title={t('builder.createNewChatbot')}
               >
                 <Plus className="w-4 h-4" />
               </button>
@@ -172,20 +174,20 @@ export default function BuilderPage() {
               <div className="p-4 bg-blue-50 border-b border-blue-200 space-y-3">
                 <input
                   type="text"
-                  placeholder="Chatbot Name"
+                  placeholder={t('builder.chatbotName')}
                   value={createForm.name}
                   onChange={(e) => setCreateForm({ ...createForm, name: e.target.value })}
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500"
                 />
                 <input
                   type="text"
-                  placeholder="Department (e.g., CS, HR, Sales)"
+                  placeholder={t('builder.departmentPlaceholder')}
                   value={createForm.department}
                   onChange={(e) => setCreateForm({ ...createForm, department: e.target.value })}
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500"
                 />
                 <textarea
-                  placeholder="Description"
+                  placeholder={t('builder.description')}
                   value={createForm.description}
                   onChange={(e) => setCreateForm({ ...createForm, description: e.target.value })}
                   rows={2}
@@ -202,14 +204,14 @@ export default function BuilderPage() {
                     onClick={() => setShowCreateForm(false)}
                     className="flex-1 px-3 py-2 text-sm text-gray-600 border border-gray-300 rounded-lg hover:bg-gray-50"
                   >
-                    Cancel
+                    {t('common.cancel')}
                   </button>
                   <button
                     onClick={handleCreate}
                     disabled={!createForm.name}
                     className="flex-1 px-3 py-2 text-sm bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50"
                   >
-                    Create
+                    {t('common.create')}
                   </button>
                 </div>
               </div>
@@ -219,7 +221,7 @@ export default function BuilderPage() {
             <div className="divide-y divide-gray-100 max-h-[calc(100vh-16rem)] overflow-y-auto">
               {chatbots.length === 0 && !showCreateForm && (
                 <div className="p-6 text-center text-gray-400 text-sm">
-                  No chatbots yet. Click + to create one.
+                  {t('builder.noChatbotsYet')}
                 </div>
               )}
               {chatbots.map((bot) => (
@@ -257,9 +259,9 @@ export default function BuilderPage() {
           {!selectedBot ? (
             <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-12 text-center">
               <Bot className="w-16 h-16 text-gray-300 mx-auto mb-4" />
-              <h3 className="text-lg font-medium text-gray-500">Select a chatbot to configure</h3>
+              <h3 className="text-lg font-medium text-gray-500">{t('builder.selectChatbot')}</h3>
               <p className="text-sm text-gray-400 mt-2">
-                Or create a new one using the + button
+                {t('builder.orCreateNew')}
               </p>
             </div>
           ) : (
@@ -285,13 +287,13 @@ export default function BuilderPage() {
                       rel="noopener noreferrer"
                       className="flex items-center gap-1.5 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 text-sm font-medium"
                     >
-                      <MessageSquare className="w-4 h-4" /> Open Chat
+                      <MessageSquare className="w-4 h-4" /> {t('builder.openChat')}
                       <ExternalLink className="w-3 h-3" />
                     </a>
                     <button
                       onClick={() => handleDelete(selectedId)}
                       className="p-2 text-red-500 hover:bg-red-50 rounded-lg"
-                      title="Delete Chatbot"
+                      title={t('builder.deleteChatbot')}
                     >
                       <Trash2 className="w-5 h-5" />
                     </button>
@@ -303,7 +305,7 @@ export default function BuilderPage() {
                   <div className="mt-4 pt-4 border-t border-gray-200">
                     <label className="block text-sm font-medium text-gray-600 mb-2 flex items-center gap-1.5">
                       <Link2 className="w-4 h-4" />
-                      Share URL
+                      {t('builder.shareUrl')}
                     </label>
                     <div className="flex items-center gap-2">
                       <input
@@ -322,11 +324,11 @@ export default function BuilderPage() {
                         className="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 text-sm font-medium flex items-center gap-1.5 whitespace-nowrap"
                       >
                         <Copy className="w-4 h-4" />
-                        {copied ? 'Copied!' : 'Copy'}
+                        {copied ? t('common.copied') : t('common.copy')}
                       </button>
                     </div>
                     <p className="text-xs text-gray-400 mt-1">
-                      Anyone with this URL can chat with this chatbot.
+                      {t('builder.shareUrlDesc')}
                     </p>
                   </div>
                 )}
@@ -334,11 +336,11 @@ export default function BuilderPage() {
 
               {/* Settings */}
               <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 space-y-4">
-                <h3 className="font-bold text-gray-800">Settings</h3>
+                <h3 className="font-bold text-gray-800">{t('builder.settings')}</h3>
 
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-sm font-medium text-gray-600 mb-1">Chatbot Name</label>
+                    <label className="block text-sm font-medium text-gray-600 mb-1">{t('builder.chatbotName')}</label>
                     <input
                       type="text"
                       value={editForm.name || ''}
@@ -347,7 +349,7 @@ export default function BuilderPage() {
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-600 mb-1">Department</label>
+                    <label className="block text-sm font-medium text-gray-600 mb-1">{t('builder.department')}</label>
                     <input
                       type="text"
                       value={editForm.department || ''}
@@ -358,7 +360,7 @@ export default function BuilderPage() {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-600 mb-1">Description</label>
+                  <label className="block text-sm font-medium text-gray-600 mb-1">{t('builder.description')}</label>
                   <textarea
                     value={editForm.description || ''}
                     onChange={(e) => setEditForm({ ...editForm, description: e.target.value })}
@@ -368,12 +370,12 @@ export default function BuilderPage() {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-600 mb-1">System Prompt (Custom Instructions)</label>
+                  <label className="block text-sm font-medium text-gray-600 mb-1">{t('builder.systemPrompt')}</label>
                   <textarea
                     value={editForm.system_prompt || ''}
                     onChange={(e) => setEditForm({ ...editForm, system_prompt: e.target.value })}
                     rows={3}
-                    placeholder="Additional instructions for the chatbot..."
+                    placeholder={t('builder.systemPromptPlaceholder')}
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
                   />
                 </div>
@@ -388,9 +390,9 @@ export default function BuilderPage() {
                     }`}
                   >
                     {editForm.is_active ? (
-                      <><Power className="w-4 h-4" /> Active</>
+                      <><Power className="w-4 h-4" /> {t('common.active')}</>
                     ) : (
-                      <><PowerOff className="w-4 h-4" /> Inactive</>
+                      <><PowerOff className="w-4 h-4" /> {t('common.inactive')}</>
                     )}
                   </button>
                 </div>
@@ -409,7 +411,7 @@ export default function BuilderPage() {
                     className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 font-medium flex items-center gap-2"
                   >
                     {saving ? <RefreshCw className="w-4 h-4 animate-spin" /> : null}
-                    Save Changes
+                    {t('builder.saveChanges')}
                   </button>
                 </div>
               </div>
@@ -419,7 +421,7 @@ export default function BuilderPage() {
                 <div className="flex items-center justify-between mb-4">
                   <h3 className="font-bold text-gray-800 flex items-center gap-2">
                     <FileText className="w-5 h-5" />
-                    Knowledge Base ({documents.length} documents)
+                    {t('builder.knowledgeBase', { count: documents.length })}
                   </h3>
                   <label className={`flex items-center gap-1.5 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 text-sm font-medium cursor-pointer ${uploading ? 'opacity-50 pointer-events-none' : ''}`}>
                     {uploading ? (
@@ -427,7 +429,7 @@ export default function BuilderPage() {
                     ) : (
                       <Upload className="w-4 h-4" />
                     )}
-                    Upload File
+                    {t('builder.uploadFile')}
                     <input
                       type="file"
                       accept=".pdf,.docx,.txt"
@@ -440,7 +442,7 @@ export default function BuilderPage() {
 
                 {documents.length === 0 ? (
                   <div className="text-center py-8 text-gray-400 text-sm">
-                    No documents uploaded. Upload PDF, Word, or TXT files to build the knowledge base.
+                    {t('builder.noDocuments')}
                   </div>
                 ) : (
                   <div className="space-y-2">
@@ -451,7 +453,7 @@ export default function BuilderPage() {
                           <div>
                             <div className="text-sm font-medium text-gray-800">{doc.filename}</div>
                             <div className="text-xs text-gray-500">
-                              {formatFileSize(doc.file_size)} | {doc.chunk_count} chunks
+                              {formatFileSize(doc.file_size)} | {doc.chunk_count} {t('builder.chunks')}
                             </div>
                           </div>
                         </div>

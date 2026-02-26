@@ -1,13 +1,7 @@
 import { useState } from 'react'
 import { Plus, Trash2, Zap, Edit2, Check, X } from 'lucide-react'
+import { useTranslation } from 'react-i18next'
 import { createAction, updateAction, deleteAction } from '../api'
-
-const ACTION_TYPES = [
-  { value: 'SHOW_FORM', label: 'Show Form', desc: 'Display a form for user input (e.g., reservation)' },
-  { value: 'SHOW_GUIDE', label: 'Show Guide', desc: 'Display step-by-step guide cards' },
-  { value: 'REDIRECT', label: 'Redirect', desc: 'Direct user to a specific URL' },
-  { value: 'NOTIFY', label: 'Notify', desc: 'Send notification to a person in charge' },
-]
 
 const DEFAULT_CONFIGS = {
   SHOW_FORM: {
@@ -32,6 +26,7 @@ const DEFAULT_CONFIGS = {
 }
 
 export default function ActionEditor({ chatbotId, actions, onUpdate }) {
+  const { t } = useTranslation()
   const [showForm, setShowForm] = useState(false)
   const [editingId, setEditingId] = useState(null)
   const [form, setForm] = useState({
@@ -41,6 +36,13 @@ export default function ActionEditor({ chatbotId, actions, onUpdate }) {
     description: '',
     config: DEFAULT_CONFIGS.SHOW_FORM,
   })
+
+  const ACTION_TYPES = [
+    { value: 'SHOW_FORM', label: t('actions.showForm'), desc: t('actions.showFormDesc') },
+    { value: 'SHOW_GUIDE', label: t('actions.showGuide'), desc: t('actions.showGuideDesc') },
+    { value: 'REDIRECT', label: t('actions.redirect'), desc: t('actions.redirectDesc') },
+    { value: 'NOTIFY', label: t('actions.notify'), desc: t('actions.notifyDesc') },
+  ]
 
   const resetForm = () => {
     setForm({
@@ -68,17 +70,17 @@ export default function ActionEditor({ chatbotId, actions, onUpdate }) {
       resetForm()
       onUpdate()
     } catch (err) {
-      alert('Failed to save action: ' + (err.response?.data?.detail || err.message))
+      alert(t('actions.failedSave') + (err.response?.data?.detail || err.message))
     }
   }
 
   const handleDelete = async (id) => {
-    if (!confirm('Delete this action?')) return
+    if (!confirm(t('actions.confirmDeleteAction'))) return
     try {
       await deleteAction(id)
       onUpdate()
     } catch (err) {
-      alert('Failed to delete action')
+      alert(t('actions.failedDelete'))
     }
   }
 
@@ -99,14 +101,14 @@ export default function ActionEditor({ chatbotId, actions, onUpdate }) {
       <div className="flex items-center justify-between">
         <h3 className="text-sm font-semibold text-gray-700 flex items-center gap-1">
           <Zap className="w-4 h-4" />
-          Actions ({actions.length})
+          {t('actions.title', { count: actions.length })}
         </h3>
         {!showForm && (
           <button
             onClick={() => { resetForm(); setShowForm(true) }}
             className="flex items-center gap-1 text-sm text-blue-600 hover:text-blue-800 font-medium"
           >
-            <Plus className="w-4 h-4" /> Add Action
+            <Plus className="w-4 h-4" /> {t('actions.addAction')}
           </button>
         )}
       </div>
@@ -138,7 +140,7 @@ export default function ActionEditor({ chatbotId, actions, onUpdate }) {
           </div>
           {action.trigger_keywords && (
             <div className="mt-1 text-xs text-gray-500">
-              Keywords: {action.trigger_keywords}
+              {t('common.keywords')}: {action.trigger_keywords}
             </div>
           )}
         </div>
@@ -148,12 +150,12 @@ export default function ActionEditor({ chatbotId, actions, onUpdate }) {
       {showForm && (
         <div className="bg-blue-50 rounded-lg p-4 border border-blue-200 space-y-3">
           <div className="text-sm font-semibold text-blue-800">
-            {editingId ? 'Edit Action' : 'New Action'}
+            {editingId ? t('actions.editAction') : t('actions.newAction')}
           </div>
 
           <input
             type="text"
-            placeholder="Action Name (e.g., Technician Reservation)"
+            placeholder={t('actions.actionNamePlaceholder')}
             value={form.name}
             onChange={(e) => setForm({ ...form, name: e.target.value })}
             className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500"
@@ -173,14 +175,14 @@ export default function ActionEditor({ chatbotId, actions, onUpdate }) {
 
           <input
             type="text"
-            placeholder="Trigger Keywords (comma separated, e.g., reservation,book,schedule)"
+            placeholder={t('actions.triggerKeywordsPlaceholder')}
             value={form.trigger_keywords}
             onChange={(e) => setForm({ ...form, trigger_keywords: e.target.value })}
             className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500"
           />
 
           <textarea
-            placeholder="Description (when should this action trigger?)"
+            placeholder={t('actions.descriptionPlaceholder')}
             value={form.description}
             onChange={(e) => setForm({ ...form, description: e.target.value })}
             rows={2}
@@ -190,7 +192,7 @@ export default function ActionEditor({ chatbotId, actions, onUpdate }) {
           {/* Config editor for SHOW_FORM */}
           {form.action_type === 'SHOW_FORM' && (
             <div className="bg-white p-3 rounded border border-gray-200">
-              <div className="text-xs font-medium text-gray-600 mb-2">Form Fields (JSON)</div>
+              <div className="text-xs font-medium text-gray-600 mb-2">{t('actions.formFieldsJson')}</div>
               <textarea
                 value={JSON.stringify(form.config, null, 2)}
                 onChange={(e) => {
@@ -207,7 +209,7 @@ export default function ActionEditor({ chatbotId, actions, onUpdate }) {
           {/* Config editor for SHOW_GUIDE */}
           {form.action_type === 'SHOW_GUIDE' && (
             <div className="bg-white p-3 rounded border border-gray-200">
-              <div className="text-xs font-medium text-gray-600 mb-2">Guide Steps (JSON)</div>
+              <div className="text-xs font-medium text-gray-600 mb-2">{t('actions.guideStepsJson')}</div>
               <textarea
                 value={JSON.stringify(form.config, null, 2)}
                 onChange={(e) => {
@@ -226,14 +228,14 @@ export default function ActionEditor({ chatbotId, actions, onUpdate }) {
             <div className="bg-white p-3 rounded border border-gray-200 space-y-2">
               <input
                 type="text"
-                placeholder="Redirect URL"
+                placeholder={t('actions.redirectUrl')}
                 value={form.config?.url || ''}
                 onChange={(e) => setForm({ ...form, config: { ...form.config, url: e.target.value } })}
                 className="w-full px-2 py-1 border border-gray-200 rounded text-sm focus:ring-2 focus:ring-blue-500"
               />
               <input
                 type="text"
-                placeholder="Button Label"
+                placeholder={t('actions.buttonLabel')}
                 value={form.config?.label || ''}
                 onChange={(e) => setForm({ ...form, config: { ...form.config, label: e.target.value } })}
                 className="w-full px-2 py-1 border border-gray-200 rounded text-sm focus:ring-2 focus:ring-blue-500"
@@ -246,14 +248,14 @@ export default function ActionEditor({ chatbotId, actions, onUpdate }) {
               onClick={resetForm}
               className="px-3 py-1.5 text-sm text-gray-600 hover:text-gray-800 flex items-center gap-1"
             >
-              <X className="w-3.5 h-3.5" /> Cancel
+              <X className="w-3.5 h-3.5" /> {t('common.cancel')}
             </button>
             <button
               onClick={handleSave}
               disabled={!form.name}
               className="px-4 py-1.5 text-sm bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 flex items-center gap-1"
             >
-              <Check className="w-3.5 h-3.5" /> Save
+              <Check className="w-3.5 h-3.5" /> {t('common.save')}
             </button>
           </div>
         </div>
