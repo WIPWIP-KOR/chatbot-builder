@@ -11,6 +11,7 @@ export const createChatbot = (data) => api.post('/chatbots', data)
 export const updateChatbot = (id, data) => api.put(`/chatbots/${id}`, data)
 export const deleteChatbot = (id) => api.delete(`/chatbots/${id}`)
 export const listProviders = () => api.get('/chatbots/providers/list')
+export const getChatbotByShareToken = (token) => api.get(`/chatbots/share/${token}`)
 
 // Document APIs
 export const uploadDocument = (chatbotId, file) => {

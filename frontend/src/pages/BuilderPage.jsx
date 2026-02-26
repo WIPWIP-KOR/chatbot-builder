@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import {
   Plus, Bot, Trash2, FileText, Upload, X, MessageSquare,
-  ChevronRight, Power, PowerOff, RefreshCw, ExternalLink
+  ChevronRight, Power, PowerOff, RefreshCw, ExternalLink, Link2, Copy
 } from 'lucide-react'
 import {
   listChatbots, createChatbot, getChatbot, updateChatbot, deleteChatbot,
@@ -28,6 +28,7 @@ export default function BuilderPage() {
     api_key: '',
   })
   const [editForm, setEditForm] = useState({})
+  const [copied, setCopied] = useState(false)
 
   useEffect(() => {
     fetchChatbots()
@@ -296,6 +297,39 @@ export default function BuilderPage() {
                     </button>
                   </div>
                 </div>
+
+                {/* Share URL */}
+                {selectedBot.share_token && (
+                  <div className="mt-4 pt-4 border-t border-gray-200">
+                    <label className="block text-sm font-medium text-gray-600 mb-2 flex items-center gap-1.5">
+                      <Link2 className="w-4 h-4" />
+                      Share URL
+                    </label>
+                    <div className="flex items-center gap-2">
+                      <input
+                        type="text"
+                        readOnly
+                        value={`${window.location.origin}/s/${selectedBot.share_token}`}
+                        className="flex-1 px-3 py-2 bg-gray-50 border border-gray-300 rounded-lg text-sm text-gray-700"
+                        onClick={(e) => e.target.select()}
+                      />
+                      <button
+                        onClick={() => {
+                          navigator.clipboard.writeText(`${window.location.origin}/s/${selectedBot.share_token}`)
+                          setCopied(true)
+                          setTimeout(() => setCopied(false), 2000)
+                        }}
+                        className="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 text-sm font-medium flex items-center gap-1.5 whitespace-nowrap"
+                      >
+                        <Copy className="w-4 h-4" />
+                        {copied ? 'Copied!' : 'Copy'}
+                      </button>
+                    </div>
+                    <p className="text-xs text-gray-400 mt-1">
+                      Anyone with this URL can chat with this chatbot.
+                    </p>
+                  </div>
+                )}
               </div>
 
               {/* Settings */}

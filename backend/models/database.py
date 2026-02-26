@@ -3,6 +3,7 @@ from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker, relationship
 from datetime import datetime
 import os
+import uuid
 
 DATABASE_URL = os.getenv("DATABASE_URL", "sqlite:///./chatbot_builder.db")
 
@@ -23,6 +24,7 @@ class Chatbot(Base):
     llm_model = Column(String, default="claude-sonnet-4-5-20250929")
     api_key = Column(String, default="")
     is_active = Column(Boolean, default=True)
+    share_token = Column(String, unique=True, index=True, default=lambda: str(uuid.uuid4()))
     created_at = Column(DateTime, default=datetime.utcnow)
 
     documents = relationship("Document", back_populates="chatbot", cascade="all, delete-orphan")
