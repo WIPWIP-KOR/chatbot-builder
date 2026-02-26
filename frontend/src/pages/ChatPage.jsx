@@ -1,10 +1,12 @@
 import { useState, useEffect } from 'react'
 import { useParams } from 'react-router-dom'
 import { Bot, ArrowLeft } from 'lucide-react'
+import { useTranslation } from 'react-i18next'
 import { getChatbot } from '../api'
 import ChatWindow from '../components/ChatWindow'
 
 export default function ChatPage() {
+  const { t } = useTranslation()
   const params = useParams()
   // Extract chatbot ID from the URL path manually
   const chatbotId = parseInt(window.location.pathname.split('/chat/')[1])
@@ -22,7 +24,7 @@ export default function ChatPage() {
       const res = await getChatbot(chatbotId)
       setChatbot(res.data.data)
     } catch (err) {
-      setError('Chatbot not found or unavailable.')
+      setError(t('chat.notFound'))
     }
   }
 
@@ -33,7 +35,7 @@ export default function ChatPage() {
           <Bot className="w-16 h-16 text-gray-300 mx-auto mb-4" />
           <p className="text-gray-500">{error}</p>
           <a href="/" className="mt-4 inline-flex items-center gap-1 text-blue-600 hover:underline text-sm">
-            <ArrowLeft className="w-4 h-4" /> Back to Builder
+            <ArrowLeft className="w-4 h-4" /> {t('chat.backToBuilder')}
           </a>
         </div>
       </div>
@@ -43,7 +45,7 @@ export default function ChatPage() {
   if (!chatbot) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="animate-pulse text-gray-400">Loading...</div>
+        <div className="animate-pulse text-gray-400">{t('common.loading')}</div>
       </div>
     )
   }

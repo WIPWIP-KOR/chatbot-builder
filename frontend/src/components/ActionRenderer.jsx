@@ -3,9 +3,11 @@ import {
   ClipboardList, ChevronRight, ChevronDown, ExternalLink,
   Bell, Check, Loader2, Send
 } from 'lucide-react'
+import { useTranslation } from 'react-i18next'
 import { submitAction } from '../api'
 
 export default function ActionRenderer({ action, chatbotId, sessionId, onSubmitted }) {
+  const { t } = useTranslation()
   const [formData, setFormData] = useState({})
   const [submitting, setSubmitting] = useState(false)
   const [submitted, setSubmitted] = useState(false)
@@ -26,7 +28,7 @@ export default function ActionRenderer({ action, chatbotId, sessionId, onSubmitt
       setSubmitted(true)
       onSubmitted?.(res.data.data)
     } catch (err) {
-      alert('Submission failed: ' + (err.response?.data?.detail || err.message))
+      alert(t('actionRenderer.submissionFailed') + (err.response?.data?.detail || err.message))
     } finally {
       setSubmitting(false)
     }
@@ -41,9 +43,9 @@ export default function ActionRenderer({ action, chatbotId, sessionId, onSubmitt
             <Check className="w-5 h-5 text-green-600" />
           </div>
           <div>
-            <div className="font-medium text-green-800">Submitted Successfully!</div>
+            <div className="font-medium text-green-800">{t('actionRenderer.submittedSuccess')}</div>
             <div className="text-sm text-green-600">
-              Your {action.action_name || 'form'} has been received.
+              {t('actionRenderer.formReceived', { name: action.action_name || 'form' })}
             </div>
           </div>
         </div>
@@ -62,7 +64,7 @@ export default function ActionRenderer({ action, chatbotId, sessionId, onSubmitt
         <div className="bg-blue-50 px-4 py-3 flex items-center gap-2 border-b border-blue-200">
           <ClipboardList className="w-5 h-5 text-blue-600" />
           <span className="font-semibold text-blue-800">
-            {action.action_name || 'Reservation Form'}
+            {action.action_name || t('actionRenderer.reservationForm')}
           </span>
         </div>
         <form onSubmit={handleFormSubmit} className="p-4 space-y-3">
@@ -87,7 +89,7 @@ export default function ActionRenderer({ action, chatbotId, sessionId, onSubmitt
                   required={field.required}
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm bg-white focus:ring-2 focus:ring-blue-500"
                 >
-                  <option value="">Select...</option>
+                  <option value="">{t('actionRenderer.select')}</option>
                   {(field.options || []).map((opt) => (
                     <option key={opt} value={opt}>{opt}</option>
                   ))}
@@ -113,7 +115,7 @@ export default function ActionRenderer({ action, chatbotId, sessionId, onSubmitt
             ) : (
               <Send className="w-4 h-4" />
             )}
-            Submit
+            {t('common.submit')}
           </button>
         </form>
       </div>
@@ -131,7 +133,7 @@ export default function ActionRenderer({ action, chatbotId, sessionId, onSubmitt
         <div className="bg-amber-50 px-4 py-3 flex items-center gap-2 border-b border-amber-200">
           <ClipboardList className="w-5 h-5 text-amber-600" />
           <span className="font-semibold text-amber-800">
-            {action.action_name || 'Step-by-Step Guide'}
+            {action.action_name || t('actionRenderer.stepByStepGuide')}
           </span>
         </div>
         <div className="p-4 space-y-2">
@@ -174,12 +176,12 @@ export default function ActionRenderer({ action, chatbotId, sessionId, onSubmitt
               onClick={() => setCurrentStep(currentStep + 1)}
               className="w-full py-2 mt-2 bg-amber-500 text-white rounded-lg hover:bg-amber-600 text-sm font-medium"
             >
-              Next Step
+              {t('actionRenderer.nextStep')}
             </button>
           )}
           {currentStep === steps.length - 1 && (
             <div className="text-center text-sm text-green-600 font-medium py-2">
-              Guide Complete!
+              {t('actionRenderer.guideComplete')}
             </div>
           )}
         </div>
@@ -198,7 +200,7 @@ export default function ActionRenderer({ action, chatbotId, sessionId, onSubmitt
       >
         <ExternalLink className="w-5 h-5 text-purple-600" />
         <span className="font-medium text-purple-800">
-          {action.data?.label || action.action_name || 'Open Link'}
+          {action.data?.label || action.action_name || t('actionRenderer.openLink')}
         </span>
       </a>
     )
@@ -212,9 +214,9 @@ export default function ActionRenderer({ action, chatbotId, sessionId, onSubmitt
           <Bell className="w-5 h-5 text-teal-600" />
         </div>
         <div>
-          <div className="font-medium text-teal-800">Notification Sent</div>
+          <div className="font-medium text-teal-800">{t('actionRenderer.notificationSent')}</div>
           <div className="text-sm text-teal-600">
-            {action.data?.message || 'The person in charge has been notified.'}
+            {action.data?.message || t('actionRenderer.personNotified')}
           </div>
         </div>
       </div>

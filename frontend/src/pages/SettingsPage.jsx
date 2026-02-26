@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import { Key, Eye, EyeOff, Save, Trash2, CheckCircle, AlertCircle, RefreshCw } from 'lucide-react'
+import { useTranslation } from 'react-i18next'
 import { getApiKeys, updateApiKeys, deleteApiKey } from '../api'
 
 const PROVIDERS = [
@@ -30,6 +31,7 @@ const PROVIDERS = [
 ]
 
 export default function SettingsPage() {
+  const { t } = useTranslation()
   const [savedKeys, setSavedKeys] = useState({})
   const [formKeys, setFormKeys] = useState({ claude: '', openai: '', gemini: '' })
   const [showKeys, setShowKeys] = useState({ claude: false, openai: false, gemini: false })
@@ -58,7 +60,7 @@ export default function SettingsPage() {
     }
 
     if (Object.keys(keysToUpdate).length === 0) {
-      setMessage({ type: 'error', text: '저장할 API 키를 입력해주세요.' })
+      setMessage({ type: 'error', text: t('settings.enterKeyToSave') })
       return
     }
 
@@ -68,22 +70,23 @@ export default function SettingsPage() {
       setFormKeys({ claude: '', openai: '', gemini: '' })
       setShowKeys({ claude: false, openai: false, gemini: false })
       await fetchKeys()
-      setMessage({ type: 'success', text: 'API 키가 저장되었습니다.' })
+      setMessage({ type: 'success', text: t('settings.keySaved') })
     } catch (err) {
-      setMessage({ type: 'error', text: '저장에 실패했습니다: ' + (err.response?.data?.detail || err.message) })
+      setMessage({ type: 'error', text: t('settings.saveFailed') + (err.response?.data?.detail || err.message) })
     } finally {
       setSaving(false)
     }
   }
 
   const handleDelete = async (provider) => {
-    if (!confirm(`${PROVIDERS.find(p => p.key === provider)?.name} API 키를 삭제하시겠습니까?`)) return
+    const providerName = PROVIDERS.find(p => p.key === provider)?.name
+    if (!confirm(t('settings.confirmDeleteKey', { provider: providerName }))) return
     try {
       await deleteApiKey(provider)
       await fetchKeys()
-      setMessage({ type: 'success', text: 'API 키가 삭제되었습니다.' })
+      setMessage({ type: 'success', text: t('settings.keyDeleted') })
     } catch (err) {
-      setMessage({ type: 'error', text: '삭제에 실패했습니다.' })
+      setMessage({ type: 'error', text: t('settings.deleteFailed') })
     }
   }
 
@@ -98,9 +101,9 @@ export default function SettingsPage() {
   return (
     <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
       <div className="mb-6">
-        <h1 className="text-2xl font-bold text-gray-900">API Key Settings</h1>
+        <h1 className="text-2xl font-bold text-gray-900">{t('settings.title')}</h1>
         <p className="text-sm text-gray-500 mt-1">
-          LLM 공급자별 API 키를 설정합니다. 여기서 설정한 키는 모든 챗봇에서 기본값으로 사용됩니다.
+          {t('settings.subtitle')}
         </p>
       </div>
 
@@ -136,11 +139,11 @@ export default function SettingsPage() {
                   {saved?.is_set ? (
                     <span className="flex items-center gap-1 text-xs font-medium text-green-600 bg-green-100 px-2 py-1 rounded-full">
                       <CheckCircle className="w-3 h-3" />
-                      설정됨
+                      {t('settings.configured')}
                     </span>
                   ) : (
                     <span className="text-xs font-medium text-gray-400 bg-gray-100 px-2 py-1 rounded-full">
-                      미설정
+                      {t('settings.notConfigured')}
                     </span>
                   )}
                 </div>
@@ -151,13 +154,13 @@ export default function SettingsPage() {
                 {saved?.is_set && (
                   <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
                     <div>
-                      <span className="text-xs text-gray-500">현재 키</span>
+                      <span className="text-xs text-gray-500">{t('settings.currentKey')}</span>
                       <p className="text-sm font-mono text-gray-700">{saved.masked_key}</p>
                     </div>
                     <button
                       onClick={() => handleDelete(provider.key)}
                       className="p-1.5 text-gray-400 hover:text-red-600 transition-colors"
-                      title="Delete API Key"
+                      title={t('settings.deleteApiKey')}
                     >
                       <Trash2 className="w-4 h-4" />
                     </button>
@@ -167,7 +170,7 @@ export default function SettingsPage() {
                 {/* Input new key */}
                 <div>
                   <label className="block text-sm font-medium text-gray-600 mb-1">
-                    {saved?.is_set ? '새 키로 교체' : 'API Key 입력'}
+                    {saved?.is_set ? t('settings.replaceKey') : t('settings.enterApiKey')}
                   </label>
                   <div className="relative">
                     <input
@@ -191,7 +194,7 @@ export default function SettingsPage() {
                     rel="noopener noreferrer"
                     className="text-xs text-blue-500 hover:text-blue-600 mt-1 inline-block"
                   >
-                    API 키 발급받기 &rarr;
+                    {t('settings.getApiKey')} &rarr;
                   </a>
                 </div>
               </div>
@@ -208,17 +211,17 @@ export default function SettingsPage() {
           className="flex items-center gap-2 px-6 py-2.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 font-medium transition-colors"
         >
           {saving ? <RefreshCw className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
-          저장
+          {t('common.save')}
         </button>
       </div>
 
       {/* Info */}
       <div className="mt-6 p-4 bg-gray-50 rounded-lg border border-gray-200">
-        <h4 className="text-sm font-semibold text-gray-700 mb-2">API 키 우선순위</h4>
+        <h4 className="text-sm font-semibold text-gray-700 mb-2">{t('settings.priorityTitle')}</h4>
         <ol className="text-sm text-gray-600 space-y-1 list-decimal list-inside">
-          <li>챗봇별 개별 설정 키 (Builder에서 설정)</li>
-          <li>이 설정 페이지에서 저장한 글로벌 키</li>
-          <li>서버 환경변수 (.env 파일)</li>
+          <li>{t('settings.priority1')}</li>
+          <li>{t('settings.priority2')}</li>
+          <li>{t('settings.priority3')}</li>
         </ol>
       </div>
     </div>
