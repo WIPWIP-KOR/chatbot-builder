@@ -2,10 +2,10 @@
 # =============================================================
 # Oracle Cloud Compute Instance - Chatbot Builder Deploy Script
 # =============================================================
-# OS: Ubuntu 22.04 (Oracle Cloud Free Tier)
+# OS: Ubuntu 22.04 (Oracle Cloud Free Tier - Ampere A1)
 #
 # Usage:
-#   1. Create Oracle Cloud Compute Instance (Ubuntu 22.04)
+#   1. Create Oracle Cloud Compute Instance (Ubuntu 22.04, ARM64)
 #   2. SSH into the instance
 #   3. Upload this project or git clone
 #   4. Run: chmod +x deploy/setup-oracle.sh && ./deploy/setup-oracle.sh
@@ -59,27 +59,47 @@ sudo iptables -I INPUT 6 -m state --state NEW -p tcp --dport 443 -j ACCEPT
 sudo netfilter-persistent save 2>/dev/null || true
 echo "Firewall rules applied."
 
-# ---- Step 5: Setup .env ----
+# ---- Step 5: Setup .env and GHCR login ----
 echo ""
 echo "[5/5] Setting up environment..."
 cd "$(dirname "$0")/.."
 
 if [ ! -f .env ]; then
     cp .env.example .env
-    echo ""
-    echo "============================================"
-    echo "  IMPORTANT: Edit .env file with API keys!"
-    echo "============================================"
-    echo "  Run: nano .env"
-    echo ""
-    echo "  Then set at least one API key:"
-    echo "    ANTHROPIC_API_KEY=sk-ant-..."
-    echo "    OPENAI_API_KEY=sk-..."
-    echo "    GEMINI_API_KEY=..."
-    echo "============================================"
-else
-    echo ".env file already exists."
 fi
+
+echo ""
+echo "============================================"
+echo "  GHCR (GitHub Container Registry) Login"
+echo "============================================"
+echo ""
+echo "  Pre-built Docker images are pulled from GHCR."
+echo "  You need a GitHub Personal Access Token (PAT)"
+echo "  with 'read:packages' scope."
+echo ""
+echo "  Create one at: https://github.com/settings/tokens"
+echo ""
+read -p "  GitHub Username: " GH_USER
+read -sp "  GitHub PAT (read:packages): " GH_TOKEN
+echo ""
+
+echo "$GH_TOKEN" | docker login ghcr.io -u "$GH_USER" --password-stdin
+
+echo ""
+echo "  GHCR login successful!"
+
+echo ""
+echo "============================================"
+echo "  Configure .env"
+echo "============================================"
+echo ""
+echo "  Edit .env file and set:"
+echo ""
+echo "    GHCR_REPO=ghcr.io/<owner>/chatbot-builder"
+echo ""
+echo "  API keys can now be set via the Settings page"
+echo "  in the web UI after deployment."
+echo "============================================"
 
 echo ""
 echo "=========================================="
@@ -88,12 +108,13 @@ echo "=========================================="
 echo ""
 echo "  Next steps:"
 echo "    1. Edit .env file:  nano .env"
-echo "    2. Start the app:   docker-compose -f docker-compose.prod.yml up -d --build"
-echo "    3. View logs:        docker-compose -f docker-compose.prod.yml logs -f"
-echo "    4. Access:           http://<YOUR_PUBLIC_IP>"
+echo "    2. Set GHCR_REPO:   GHCR_REPO=ghcr.io/<owner>/chatbot-builder"
+echo "    3. Deploy:           ./deploy/update.sh"
+echo "    4. View logs:        docker compose -f docker-compose.prod.yml logs -f"
+echo "    5. Access:           http://<YOUR_PUBLIC_IP>"
 echo ""
-echo "  Stop:    docker-compose -f docker-compose.prod.yml down"
-echo "  Restart: docker-compose -f docker-compose.prod.yml restart"
+echo "  Stop:    docker compose -f docker-compose.prod.yml down"
+echo "  Update:  ./deploy/update.sh"
 echo ""
 echo "  NOTE: Also open port 80 in Oracle Cloud"
 echo "        Security List / Network Security Group!"

@@ -1,8 +1,14 @@
 version: "3.8"
 
+# -------------------------------------------------------
+# Production Compose - uses pre-built images from GHCR
+# Set GHCR_REPO env var or edit image names below.
+#   Example: GHCR_REPO=ghcr.io/yourname/chatbot-builder
+# -------------------------------------------------------
+
 services:
   backend:
-    build: ./backend
+    image: ${GHCR_REPO}/backend:latest
     restart: always
     volumes:
       - uploads-data:/app/uploads
@@ -16,9 +22,7 @@ services:
       - app-network
 
   frontend:
-    build:
-      context: ./frontend
-      dockerfile: Dockerfile.prod
+    image: ${GHCR_REPO}/frontend:latest
     restart: always
     ports:
       - "80:80"
