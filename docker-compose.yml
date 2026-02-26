@@ -6,22 +6,22 @@ services:
     ports:
       - "8000:8000"
     volumes:
-      - ./uploads:/app/../uploads
-      - ./chroma_db:/app/../chroma_db
-      - db-data:/app
+      - uploads:/app/uploads
+      - chroma-data:/app/chroma_db
+      - db-data:/app/data
     env_file:
       - .env
     environment:
-      - DATABASE_URL=sqlite:///./chatbot_builder.db
+      - DATABASE_URL=sqlite:///./data/chatbot_builder.db
 
   frontend:
     build: ./frontend
     ports:
-      - "5173:5173"
+      - "80:80"
     depends_on:
       - backend
-    environment:
-      - VITE_API_URL=http://backend:8000
 
 volumes:
+  uploads:
+  chroma-data:
   db-data:

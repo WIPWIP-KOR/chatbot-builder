@@ -2,14 +2,20 @@ import { Routes, Route, Link, useLocation } from 'react-router-dom'
 import { Bot, Settings, MessageSquare, Key } from 'lucide-react'
 import BuilderPage from './pages/BuilderPage'
 import ChatPage from './pages/ChatPage'
+import SharedChatPage from './pages/SharedChatPage'
 import SettingsPage from './pages/SettingsPage'
 
 function App() {
   const location = useLocation()
   const isChatPage = location.pathname.startsWith('/chat/')
+  const isSharedChatPage = location.pathname.startsWith('/s/')
 
   if (isChatPage) {
     return <ChatPage />
+  }
+
+  if (isSharedChatPage) {
+    return <SharedChatPage />
   }
 
   return (

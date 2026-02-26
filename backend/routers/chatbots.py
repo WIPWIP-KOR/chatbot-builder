@@ -43,6 +43,7 @@ def list_chatbots(db: Session = Depends(get_db)):
                 "llm_provider": c.llm_provider,
                 "llm_model": c.llm_model,
                 "is_active": c.is_active,
+                "share_token": c.share_token,
                 "created_at": c.created_at.isoformat() if c.created_at else None,
                 "document_count": len(c.documents),
                 "action_count": len(c.actions),
@@ -50,6 +51,26 @@ def list_chatbots(db: Session = Depends(get_db)):
             for c in chatbots
         ],
         "message": "Chatbots retrieved successfully",
+    }
+
+
+@router.get("/share/{share_token}")
+def get_chatbot_by_share_token(share_token: str, db: Session = Depends(get_db)):
+    chatbot = db.query(Chatbot).filter(Chatbot.share_token == share_token).first()
+    if not chatbot:
+        raise HTTPException(status_code=404, detail="Shared chatbot not found")
+    if not chatbot.is_active:
+        raise HTTPException(status_code=403, detail="This chatbot is currently inactive")
+    return {
+        "success": True,
+        "data": {
+            "id": chatbot.id,
+            "name": chatbot.name,
+            "department": chatbot.department,
+            "description": chatbot.description,
+            "is_active": chatbot.is_active,
+        },
+        "message": "Shared chatbot retrieved successfully",
     }
 
 
@@ -70,6 +91,7 @@ def get_chatbot(chatbot_id: int, db: Session = Depends(get_db)):
             "llm_model": chatbot.llm_model,
             "api_key": "***" if chatbot.api_key else "",
             "is_active": chatbot.is_active,
+            "share_token": chatbot.share_token,
             "created_at": chatbot.created_at.isoformat() if chatbot.created_at else None,
             "documents": [
                 {
@@ -115,7 +137,7 @@ def create_chatbot(data: ChatbotCreate, db: Session = Depends(get_db)):
     db.refresh(chatbot)
     return {
         "success": True,
-        "data": {"id": chatbot.id, "name": chatbot.name},
+        "data": {"id": chatbot.id, "name": chatbot.name, "share_token": chatbot.share_token},
         "message": "Chatbot created successfully",
     }
 
