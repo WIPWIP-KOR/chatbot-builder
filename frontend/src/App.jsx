@@ -1,7 +1,8 @@
 import { Routes, Route, Link, useLocation } from 'react-router-dom'
-import { Bot, Settings, MessageSquare } from 'lucide-react'
+import { Bot, Settings, MessageSquare, Key } from 'lucide-react'
 import BuilderPage from './pages/BuilderPage'
 import ChatPage from './pages/ChatPage'
+import SettingsPage from './pages/SettingsPage'
 
 function App() {
   const location = useLocation()
@@ -27,10 +28,25 @@ function App() {
             <nav className="flex items-center gap-4">
               <Link
                 to="/"
-                className="flex items-center gap-1.5 px-3 py-2 text-sm font-medium text-gray-700 hover:text-blue-600 rounded-lg hover:bg-gray-100 transition-colors"
+                className={`flex items-center gap-1.5 px-3 py-2 text-sm font-medium rounded-lg transition-colors ${
+                  location.pathname === '/'
+                    ? 'text-blue-600 bg-blue-50'
+                    : 'text-gray-700 hover:text-blue-600 hover:bg-gray-100'
+                }`}
               >
                 <Settings className="w-4 h-4" />
                 Builder
+              </Link>
+              <Link
+                to="/settings"
+                className={`flex items-center gap-1.5 px-3 py-2 text-sm font-medium rounded-lg transition-colors ${
+                  location.pathname === '/settings'
+                    ? 'text-blue-600 bg-blue-50'
+                    : 'text-gray-700 hover:text-blue-600 hover:bg-gray-100'
+                }`}
+              >
+                <Key className="w-4 h-4" />
+                API Keys
               </Link>
             </nav>
           </div>
@@ -41,6 +57,7 @@ function App() {
       <main>
         <Routes>
           <Route path="/" element={<BuilderPage />} />
+          <Route path="/settings" element={<SettingsPage />} />
         </Routes>
       </main>
     </div>

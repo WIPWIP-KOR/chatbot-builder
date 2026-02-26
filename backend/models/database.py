@@ -86,6 +86,15 @@ class ActionSubmission(Base):
     created_at = Column(DateTime, default=datetime.utcnow)
 
 
+class ApiKeySetting(Base):
+    __tablename__ = "api_key_settings"
+
+    id = Column(Integer, primary_key=True, index=True)
+    provider = Column(String, unique=True, nullable=False)  # claude, openai, gemini
+    api_key = Column(String, nullable=False)
+    updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+
+
 def get_db():
     db = SessionLocal()
     try:

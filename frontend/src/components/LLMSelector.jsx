@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
-import { Cpu, Key, Eye, EyeOff } from 'lucide-react'
+import { Cpu, Key, Eye, EyeOff, CheckCircle } from 'lucide-react'
+import { getApiKeys } from '../api'
 
 const PROVIDERS = {
   claude: {
@@ -30,7 +31,14 @@ const PROVIDERS = {
 
 export default function LLMSelector({ provider, model, apiKey, onChange }) {
   const [showKey, setShowKey] = useState(false)
+  const [globalKeys, setGlobalKeys] = useState({})
   const currentProvider = PROVIDERS[provider] || PROVIDERS.claude
+
+  useEffect(() => {
+    getApiKeys()
+      .then((res) => setGlobalKeys(res.data.data))
+      .catch(() => {})
+  }, [])
 
   return (
     <div className="space-y-4">
@@ -105,9 +113,16 @@ export default function LLMSelector({ provider, model, apiKey, onChange }) {
               {showKey ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
             </button>
           </div>
-          <p className="text-xs text-gray-400 mt-1">
-            Key is stored for this chatbot only. Leave empty to use environment variable.
-          </p>
+          {globalKeys[provider]?.is_set ? (
+            <p className="text-xs text-green-600 mt-1 flex items-center gap-1">
+              <CheckCircle className="w-3 h-3" />
+              글로벌 API 키가 설정되어 있습니다. 비워두면 글로벌 키를 사용합니다.
+            </p>
+          ) : (
+            <p className="text-xs text-gray-400 mt-1">
+              이 챗봇 전용 키입니다. 비워두면 Settings에서 설정한 글로벌 키 또는 환경변수를 사용합니다.
+            </p>
+          )}
         </div>
       )}
     </div>

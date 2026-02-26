@@ -36,4 +36,9 @@ export const sendMessage = (data) => api.post('/chat', data)
 export const getChatHistory = (chatbotId, sessionId) =>
   api.get(`/chat/history/${chatbotId}/${sessionId}`)
 
+// Settings APIs
+export const getApiKeys = () => api.get('/settings/api-keys')
+export const updateApiKeys = (keys) => api.put('/settings/api-keys', { keys })
+export const deleteApiKey = (provider) => api.delete(`/settings/api-keys/${provider}`)
+
 export default api

@@ -1,6 +1,6 @@
 from typing import List, Dict, Optional
 from sqlalchemy.orm import Session
-from models.database import Chatbot, Conversation, Action
+from models.database import Chatbot, Conversation, Action, ApiKeySetting
 from services.llm.factory import get_llm_provider
 from services.rag_service import query_vectordb
 from services.action_service import build_action_prompt, parse_action_from_response
@@ -77,11 +77,20 @@ async def process_chat(
         messages.append({"role": conv.role, "content": conv.content})
     messages.append({"role": "user", "content": message})
 
+    # Resolve API key: per-chatbot > DB settings > env var
+    api_key = chatbot.api_key if chatbot.api_key else None
+    if not api_key:
+        db_setting = db.query(ApiKeySetting).filter(
+            ApiKeySetting.provider == chatbot.llm_provider
+        ).first()
+        if db_setting:
+            api_key = db_setting.api_key
+
     # Get LLM provider and generate response
     provider = get_llm_provider(
         provider=chatbot.llm_provider,
         model=chatbot.llm_model,
-        api_key=chatbot.api_key if chatbot.api_key else None,
+        api_key=api_key,
     )
 
     raw_response = await provider.chat(messages, system_prompt)
