@@ -28,7 +28,7 @@ docker compose -f docker-compose.prod.yml pull
 
 echo ""
 echo "Restarting containers..."
-docker compose -f docker-compose.prod.yml up -d
+docker compose -f docker-compose.prod.yml up -d --remove-orphans
 
 echo ""
 echo "Cleaning up old images..."
