@@ -49,8 +49,8 @@ export default function SharedChatPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 flex flex-col">
-      <header className="bg-white border-b border-gray-200 shadow-sm">
+    <div className="h-dvh bg-gray-50 flex flex-col overflow-hidden">
+      <header className="bg-white border-b border-gray-200 shadow-sm flex-shrink-0">
         <div className="max-w-3xl mx-auto px-4 py-3 flex items-center gap-3">
           <div className="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center">
             <Bot className="w-5 h-5 text-blue-600" />
@@ -65,7 +65,7 @@ export default function SharedChatPage() {
         </div>
       </header>
 
-      <div className="flex-1 max-w-3xl w-full mx-auto flex flex-col">
+      <div className="flex-1 min-h-0 max-w-3xl w-full mx-auto flex flex-col">
         <ChatWindow chatbotId={chatbot.id} chatbot={chatbot} />
       </div>
     </div>
