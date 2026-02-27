@@ -199,5 +199,10 @@ def list_providers():
             "models": ["llama3", "mistral", "gemma3"],
             "requires_api_key": False,
         },
+        "groq": {
+            "name": "Groq (Free)",
+            "models": ["llama-3.3-70b-versatile", "llama-3.1-8b-instant", "mixtral-8x7b-32768", "gemma2-9b-it"],
+            "requires_api_key": True,
+        },
     }
     return {"success": True, "data": providers, "message": "Providers retrieved successfully"}

@@ -28,6 +28,12 @@ const PROVIDERS = {
     requiresApiKey: false,
     color: 'bg-purple-100 text-purple-700 border-purple-200',
   },
+  groq: {
+    name: 'Groq (Free)',
+    models: ['llama-3.3-70b-versatile', 'llama-3.1-8b-instant', 'mixtral-8x7b-32768', 'gemma2-9b-it'],
+    requiresApiKey: true,
+    color: 'bg-teal-100 text-teal-700 border-teal-200',
+  },
 }
 
 export default function LLMSelector({ provider, model, apiKey, onChange }) {

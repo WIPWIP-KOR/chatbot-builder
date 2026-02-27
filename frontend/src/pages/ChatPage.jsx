@@ -51,9 +51,9 @@ export default function ChatPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 flex flex-col">
+    <div className="h-dvh bg-gray-50 flex flex-col overflow-hidden">
       {/* Chat Header */}
-      <header className="bg-white border-b border-gray-200 shadow-sm">
+      <header className="bg-white border-b border-gray-200 shadow-sm flex-shrink-0">
         <div className="max-w-3xl mx-auto px-4 py-3 flex items-center gap-3">
           <a href="/" className="p-1 text-gray-400 hover:text-gray-600 rounded">
             <ArrowLeft className="w-5 h-5" />
@@ -73,7 +73,7 @@ export default function ChatPage() {
       </header>
 
       {/* Chat Area */}
-      <div className="flex-1 max-w-3xl w-full mx-auto flex flex-col">
+      <div className="flex-1 min-h-0 max-w-3xl w-full mx-auto flex flex-col">
         <ChatWindow chatbotId={chatbotId} chatbot={chatbot} />
       </div>
     </div>

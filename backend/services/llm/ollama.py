@@ -30,6 +30,18 @@ class OllamaProvider(BaseLLMProvider):
                 response.raise_for_status()
                 data = response.json()
                 return data["message"]["content"]
+        except httpx.ConnectError:
+            raise Exception(
+                f"Ollama 서버({self.base_url})에 연결할 수 없습니다. "
+                "Ollama가 실행 중인지 확인해주세요."
+            )
+        except httpx.HTTPStatusError as e:
+            if e.response.status_code == 404:
+                raise Exception(
+                    f"Ollama 모델 '{self.model}'을 찾을 수 없습니다. "
+                    f"터미널에서 'ollama pull {self.model}'을 실행해주세요."
+                )
+            raise Exception(f"Ollama API 오류 (HTTP {e.response.status_code}): {e.response.text}")
         except Exception as e:
             raise Exception(f"Ollama API error: {str(e)}")
 

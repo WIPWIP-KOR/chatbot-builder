@@ -48,11 +48,12 @@ export default function ChatWindow({ chatbotId, chatbot }) {
         },
       ])
     } catch (err) {
+      const detail = err.response?.data?.detail
       setMessages((prev) => [
         ...prev,
         {
           role: 'assistant',
-          content: t('chat.errorMessage'),
+          content: detail || t('chat.errorMessage'),
           error: true,
         },
       ])
