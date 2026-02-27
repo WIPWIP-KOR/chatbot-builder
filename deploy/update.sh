@@ -10,7 +10,8 @@ cd "$(dirname "$0")/.."
 
 # ---- Load GHCR_REPO from .env ----
 if [ -f .env ]; then
-  export $(grep -v '^#' .env | grep GHCR_REPO | xargs)
+  GHCR_REPO=$(grep '^GHCR_REPO=' .env | cut -d'=' -f2- | tr -d '[:space:]<>')
+  export GHCR_REPO
 fi
 
 if [ -z "$GHCR_REPO" ]; then
