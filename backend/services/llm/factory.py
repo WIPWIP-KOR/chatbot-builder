@@ -4,6 +4,7 @@ from .claude import ClaudeProvider
 from .openai_provider import OpenAIProvider
 from .gemini import GeminiProvider
 from .ollama import OllamaProvider
+from .groq import GroqProvider
 
 
 def get_llm_provider(provider: str, model: str, api_key: str = None) -> BaseLLMProvider:
@@ -14,6 +15,7 @@ def get_llm_provider(provider: str, model: str, api_key: str = None) -> BaseLLMP
         "claude": "ANTHROPIC_API_KEY",
         "openai": "OPENAI_API_KEY",
         "gemini": "GEMINI_API_KEY",
+        "groq": "GROQ_API_KEY",
     }
 
     if not api_key and provider in env_keys:
@@ -24,6 +26,7 @@ def get_llm_provider(provider: str, model: str, api_key: str = None) -> BaseLLMP
         "openai": OpenAIProvider,
         "gemini": GeminiProvider,
         "ollama": OllamaProvider,
+        "groq": GroqProvider,
     }
 
     if provider not in providers:
