@@ -1,5 +1,3 @@
-version: "3.8"
-
 # -------------------------------------------------------
 # Production Compose - uses pre-built images from GHCR
 # Set GHCR_REPO env var or edit image names below.
